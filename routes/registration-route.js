@@ -68,5 +68,8 @@ function registerUser() {
     formData['email'] = email.value;
     formData['phone'] = phone.value;
     formData['password'] = password.value;
+
+    // module.exports = formData;
 }
+
 

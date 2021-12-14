@@ -14,6 +14,7 @@ const expressFormData = require('express-form-data');
 const mongoose = require('mongoose');
 const UserModel = require('./models/UserModel.js');
 const userRoutes = require('./routes/user-routes.js');
+
 // Use passport, passport-jwt to read the clien't jwt
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
@@ -62,13 +63,24 @@ const passportJwt = (passport) => {
 passportJwt(passport)
 
 
+// Import and configure Cloudinary
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config(
+    {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    }
+)
+
 // Run the express function to get the methods
 const server = express(); 
 
 // Configure express-form-data for server
 // Is for reading HTML form data
 server.use( expressFormData.parse() );
-
+server.use( cors() );
 
 // Declare the connnection string
 const connectionString = process.env.MONGODB_CONNECTION_STRING;
@@ -94,14 +106,17 @@ mongoose
     }
 )
 
+// This is only here to quicklt check that the backend is running
+server.get('/', function(req, res){res.send('Welcome')});
+
 
 server.use(
-    '/user', userRoutes
+    '/user', userRoutes    
 );
 
 // This is the last thing in your file
 server.listen(
-    process.env.PORT || 3001,
+    process.env.PORT,
     function() {
         console.log('connected to http://localhost:3001/');
     }
