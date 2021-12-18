@@ -275,5 +275,4 @@ router.get(
 // router.post('/login')
 // router.get('/all')
 
-
 module.exports = router;
