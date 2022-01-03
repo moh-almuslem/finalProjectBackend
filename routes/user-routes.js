@@ -272,6 +272,110 @@ router.get(
     }
 )
 
+
+
+
+
+router.patch('/update',
+    function (req, res) {
+
+
+        // Client (browser, postman) POSTs this...
+        const formData = {
+
+            'firstName': req.body.firstName,
+            'lastName': req.body.lastName,
+            'email': req.body.email,
+            'password': req.body.password,
+            'phone': req.body.phone,
+        }
+
+        // Check if email exists
+        UserModel
+            .findOne({ email: formData.email })
+            .then(
+                async function (dbDocument) {
+
+                 
+                    // If avatar file is included...
+                     if( Object.values(req.files).length > 0 ) {
+
+                    const files = Object.values(req.files);
+
+
+                    // upload to Cloudinary
+                    await cloudinary.uploader.upload(
+                        files[0].path,
+                        (cloudinaryErr, cloudinaryResult) => {
+                            if(cloudinaryErr) {
+                                console.log(cloudinaryErr);
+                                 return res.json(
+                                    {
+                                        status: "not ok",
+                                        message: "Error occured during image upload"
+                                    }
+                                )
+                            } else {
+                                // Include the image url in formData
+                                formData.avatar = cloudinaryResult.url;
+                                console.log('formData.avatar', formData.avatar)
+                            }
+                        }
+                    )
+                    };
+
+                    // If email is unique...
+                    if (dbDocument) {
+
+                        UserModel
+                            .updateOne(
+                                { email: formData.email },
+                                {
+                                    firstName: formData.firstName,
+                                    lastName: formData.lastName,
+                                    email: formData.email,
+                                    password: formData.password,
+                                    phone: formData.phone,
+                                    avatar: formData.avatar
+                                }
+                            ).then((doc) => {
+                               return res.status(200).json({
+                                    sucess:true
+                                })
+                            })
+                    }
+                 
+                    else {
+                        // reject the request
+                        res.status(403).json(
+                            {
+                                "status": "not ok",
+                                "message": "Account already exists"
+                            }
+                        )
+                    }
+                }
+            )
+            .catch(
+                function (dbError) {
+
+                    // For the developer
+                    console.log(
+                        'An error occured', dbError
+                    );
+
+                    // For the client (frontend app)
+                    res.status(503).json(
+                        {
+                            "status": "not ok",
+                            "message": "Something went wrong with db"
+                        }
+                    )
+
+                }
+            )
+    }
+);
 // router.post('/login')
 // router.get('/all')
 
