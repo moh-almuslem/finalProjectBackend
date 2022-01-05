@@ -15,6 +15,9 @@ const mongoose = require('mongoose');
 const UserModel = require('./models/UserModel.js');
 const userRoutes = require('./routes/user-routes.js');
 
+const BookingModel = require('./models/BookingModel.js');
+const bookingRoutes = require('./routes/booking-routes.js');
+
 // Use passport, passport-jwt to read the clien't jwt
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
@@ -113,6 +116,10 @@ server.get('/', function(req, res){res.send('Welcome')});
 server.use(
     '/user', userRoutes    
 );
+
+// server.use(
+//     '/booking', bookingRoutes    
+// );
 
 // This is the last thing in your file
 server.listen(
